@@ -1,0 +1,19 @@
+comment this line is a comment but dont use it if you're not an asshole
+
+# set variable name to User
+set name User
+
+# print the name
+print $name
+
+# use input
+input name What is your name?>
+
+# clear terminal
+clean
+
+# print the greeting
+print Hello $name !
+
+# print all variable and their values
+dump
