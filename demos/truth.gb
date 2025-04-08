@@ -1,0 +1,5 @@
+input fact
+?$fact == 0 3
+print 1
+?True 1
+print 0

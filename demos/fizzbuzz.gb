@@ -1,0 +1,22 @@
+set number 0
+:loop
+    input wait " "
+    set number $number + 1
+    ?$number % 3 == 0 $fizz
+    ?$number % 5 == 0 $buzz
+    print $number
+?True $loop
+
+:fizz
+    ?$number % 5 == 0 $fizzbuzz
+    print fizz
+?True $loop
+
+:buzz
+    ?$number % 3 == 0 $fizzbuzz
+    print buzz
+?True $loop
+
+:fizzbuzz
+    print fizzbuzz!
+?True $loop

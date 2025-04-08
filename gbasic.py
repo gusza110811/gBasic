@@ -163,6 +163,16 @@ class parser:
                         chunks.pop(idx-1)
                         chunks.pop(idx)
                         break
+                    elif chunk == "//":
+                        chunks[idx] = str(float(chunks[idx-1]) // float(chunks[idx+1]))
+                        chunks.pop(idx-1)
+                        chunks.pop(idx)
+                        break
+                    elif chunk == "%":
+                        chunks[idx] = str(float(chunks[idx-1]) % float(chunks[idx+1]))
+                        chunks.pop(idx-1)
+                        chunks.pop(idx)
+                        break
                 except ValueError:
                     return "Type error: You must use Number"
                 
@@ -248,12 +258,41 @@ def execute(lines:str, mem:list[str]=None):
 if __name__ == "__main__":
     try:
         filename = sys.argv[1]
+        file = ""
+
+        try:
+            with open(filename) as rawfile:
+                file = rawfile.read()
+        except FileNotFoundError:
+            print("That Program doesnt exist")
+            quit()
     except IndexError:
-        filename = "demo.gb"
+        DEMO = """comment this line is a comment but dont use it like this if you're not hated by society
 
-    file = ""
+# ram dump
+dump
 
-    with open(filename) as rawfile:
-        file = rawfile.read()
+# basic loop.
+:loop
+# take user input
+input user Enter 1>
+
+set isone $user == 1
+
+# exit the loop if user input is 1
+?$isone $end
+
+clean
+print No!
+# the reason i am too lazy to add a seperate jump command
+?True $loop
+
+# free at last
+:end
+print Thank you
+"""
+        file = DEMO
+
+
     
     execute(file)
