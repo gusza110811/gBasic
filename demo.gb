@@ -1,19 +1,23 @@
-comment this line is a comment but dont use it if you're not an asshole
+comment this line is a comment but dont use it like this if you're not hated by society
 
-# set variable name to User
-set name User
-
-# print the name
-print $name
-
-# use input
-input name What is your name?>
-
-# clear terminal
-clean
-
-# print the greeting
-print Hello $name !
-
-# print all variable and their values
+# ram dump
 dump
+
+# basic loop.
+:loop
+# take user input
+input user Enter 1>
+
+set isone $user == 1
+
+# exit the loop if user input is 1
+?$isone $end
+
+clean
+print No!
+# the reason i am too lazy to add a seperate jump command
+?True $loop
+
+# free at last
+:end
+print Thank you
