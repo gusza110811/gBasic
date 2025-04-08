@@ -46,9 +46,6 @@ class commands:
     
     def clean(text:list[str]):
         os.system("cls")
-
-    def cmd(text:list[str]):
-        memory.value["mode'"] = "cmd"
     
     def gotoif(text:list[str]):
         condition = text[0]
