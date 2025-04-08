@@ -27,11 +27,11 @@ Use `"` or `'` to surround a text to make it one token of data, this also allows
 
 # Arithmetics
 Supported calculations are
-`+`addition `-`subtraction `*`multiplication `/`division and `**`exponentiation
+`+`addition `-`subtraction `*`multiplication `**`exponentiation `/`division `//`floor division and `%`modulo
 
 ## Comparators
 Supported comparators are
-`==`equals to `>`more than `<`less than
+`==`equals to `<`less than `>`more than 
 
 ## Boolean Arithmetics
 Supported calculations are
