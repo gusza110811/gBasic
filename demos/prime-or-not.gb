@@ -1,0 +1,16 @@
+:loop
+    input number
+    set loopcount 2
+
+    :check
+        set mod $number % $loopcount
+        if $mod == 0 $no
+        set loopcount $loopcount + 1
+        if $loopcount < $number $check
+
+        print yes it is
+        if True $loop
+
+        :no
+        print No it isn't
+        if True $loop

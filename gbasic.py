@@ -65,10 +65,8 @@ class parser:
         chunks:list[list[str]] = []
         # parse each line
         for linenum, line in enumerate(lines):
+            line = line.strip()
             linechunks = []
-            if line.startswith("#"):
-                chunks.append(["comment"])
-                continue
             if line == "":
                 chunks.append(["comment"])
                 continue
@@ -79,6 +77,7 @@ class parser:
             for idx, chunk in enumerate(lowchunks):
 
                 if chunk.startswith("#"):
+                    chunks.append(["comment"])
                     break
                 
                 if idx == 0:

@@ -1,22 +1,25 @@
 set number 0
-:loop
-    input wait " "
-    set number $number + 1
-    ?$number % 3 == 0 $fizz
-    ?$number % 5 == 0 $buzz
-    print $number
+
 ?True $loop
 
 :fizz
     ?$number % 5 == 0 $fizzbuzz
     print fizz
-?True $loop
+?True $next
 
 :buzz
     ?$number % 3 == 0 $fizzbuzz
     print buzz
-?True $loop
+?True $next
 
 :fizzbuzz
     print fizzbuzz!
-?True $loop
+?True $next
+
+:loop
+    set number $number + 1
+    ?$number % 3 == 0 $fizz
+    ?$number % 5 == 0 $buzz
+    print $number
+    :next
+?$number < 100 $loop

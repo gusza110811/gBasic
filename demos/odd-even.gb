@@ -1,0 +1,10 @@
+:loop
+input number
+
+?$number % 2 == 1 $odd
+print that's even
+?True $loop
+
+:odd
+print that's odd
+?True $loop
