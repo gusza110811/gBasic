@@ -46,3 +46,5 @@ for example
 `2 == 9` means 2=9 and is considered as one token `False` while `2==9` is just `2==9`
 
 `~~ False` means not(False) and is considered as one token `True` while `~~False` is just `~~False`
+
+###### \*Compiled and Interpreted gBasic may be slightly different

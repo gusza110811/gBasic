@@ -263,7 +263,7 @@ if __name__ == "__main__":
             with open(filename) as rawfile:
                 file = rawfile.read()
         except FileNotFoundError:
-            print("That Program doesnt exist")
+            print("That Program doesn't exist")
             quit()
     except IndexError:
         DEMO = """comment this line is a comment but dont use it like this if you're not hated by society
