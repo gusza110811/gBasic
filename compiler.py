@@ -14,6 +14,7 @@ class compiler:
     compilingline = 0
     variables = {}
     bytecode = []
+    labelmap = {}
 
     mainend = 0
 
@@ -44,7 +45,8 @@ class compiler:
         compiler.bytecode.append(opcode)
         if isinstance(value, int):
             length = math.ceil(value/((2**8)-1))
-            compiler.bytecode.extend(value.to_bytes(length, byteorder="little"))
+            compiler.bytecode.extend(length.to_bytes(1))
+            compiler.bytecode.extend(value.to_bytes(length, byteorder="big"))
         elif isinstance(value, str):
             compiler.bytecode.extend(value.encode("ascii"))
         compiler.bytecode.append(0xFF)
@@ -82,6 +84,7 @@ class compiler:
     def compilelineparsed(line: list[str]):
         if line[0] == "comment":
             compiler.bytecode.append(0xAB)
+            compiler.bytecode.append(0xFF)
             return
 
         if line[0] == "print":
@@ -92,9 +95,10 @@ class compiler:
             else:
                 for word in args:
                     compiler.add_instruction(0x00, word)
+            compiler.add_instruction(0x00, "\n")
 
         elif line[0] == "dump":
-            compiler.add_instruction(0x01, "")
+            compiler.add_instruction(0x01, "0")
 
         elif line[0] == "gotoif":
             cond = line[1]
@@ -102,7 +106,11 @@ class compiler:
                 compiler.add_instruction(0x05, cond[1:])
             else:
                 compiler.add_instruction(0xA0, cond)
-            compiler.add_instruction(0x04, line[2])
+            try:
+                label = compiler.labelmap[line[2][1:]]
+            except KeyError:
+                label = None
+            compiler.add_instruction(0x04, label)
 
         elif line[0] == "set":
             chunks = compiler.compile_expr(line[2:])
@@ -118,28 +126,19 @@ class compiler:
         parsed = parser.parse(lines)
 
         # First pass to get label addresses
-        labelmap = {}
+        compiler.labelmap = {}
         pc = 0
         for line in parsed:
             if line and line[0] == "comment" and len(line) > 1 and line[1].startswith(":"):
-                labelmap[line[1][1:]] = pc
+                compiler.labelmap[line[1][1:]] = pc
             pc += compiler.simulate_length(line)
-        compiler.add_instruction(0x05, "True")
-        compiler.add_instruction(0xA0, pc+10)
+        
 
         # Second pass: real compilation
         for line in parsed:
             compiler.compilelineparsed(line)
-        
+
         compiler.add_instruction(0xAF, 0)
-
-        # Emit label header
-        for label, addr in labelmap.items():
-            compiler.add_instruction(0xA0, addr+10)
-            compiler.add_instruction(0x02, label)
-
-        compiler.add_instruction(0x05, "True")
-        compiler.add_instruction(0xA0, 1)
 
         return bytes(compiler.bytecode)
 
@@ -210,6 +209,7 @@ print Go
 ?True $loop
 :end
 print End
+dump
 """
 
     except FileNotFoundError:
