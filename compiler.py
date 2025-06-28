@@ -216,7 +216,7 @@ class parser:
 
 if __name__ == "__main__":
     try:
-        filename = "demos/file-i-o-test" #sys.argv[1]
+        filename = sys.argv[1]
         with open(f"{filename}.gb") as f:
             code = f.read()
 
