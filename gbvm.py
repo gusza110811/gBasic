@@ -1,8 +1,9 @@
 import sys
 import os
+import zipfile
 
 class virtual:
-    memory = {}
+    memory = {"n":"\n"}
     acc = ""
     code = []
     pc = 0
@@ -39,7 +40,16 @@ class virtual:
         if opcode == 0x00:  # print
             val = virtual.read_ascii()
             val = virtual.memory.get(val, val) if val != "_" else virtual.acc
-            print(val, end="")
+            try:
+                if bytes(val,'utf-8') == bytes(128):
+                    if os.name == "nt":
+                        os.system("cls")
+                    else:
+                        os.system("clear")
+            except UnicodeDecodeError:
+                pass
+            else:
+                print(val, end="")
 
         elif opcode == 0x01:  # dump
             for k, v in virtual.memory.items():
@@ -124,6 +134,17 @@ class virtual:
         elif opcode == 0xD2:  # not
             _ = virtual.read_ascii()
             virtual.acc = str(virtual.acc.lower() == "false")
+        
+        # file i/o
+        elif opcode == 0xE0: # read
+            try:
+                with open(virtual.read_ascii(),'r') as file:
+                    virtual.acc = file.read()
+            except FileNotFoundError:
+                pass
+        elif opcode == 0xE1: # write
+            with open(virtual.read_ascii(),'w') as file:
+                file.write(virtual.acc)
 
         return True
 
@@ -134,6 +155,19 @@ class virtual:
             running = virtual.executeline()
             continue
 
+class package:
+    @staticmethod
+    def unpack(file:str):
+        with zipfile.ZipFile(file,'r') as zipped:
+            zipped.extractall(f".{file.replace("/",".")}")
+        os.chdir(f".{file.replace("/",".")}")
+        
+        with open("meta",'r') as mainscript:
+            mainscript = mainscript.read() + ".gbc"
+        
+        with open(mainscript, 'rb') as code:
+            virtual.code = code.read()
+
 if __name__ == "__main__":
     try:
         filename = sys.argv[1]
@@ -141,12 +175,15 @@ if __name__ == "__main__":
             virtual.code = list(f.read())
 
     except IndexError:
-        filename = "demo.gbo"
+        filename = "demo.gbc"
         with open(filename, "rb") as f:
             virtual.code = list(f.read())
 
     except FileNotFoundError:
         print("File not found.")
         quit(1)
+
+    if filename[-3:] == "bar":
+        package.unpack(filename)
 
     virtual.execute()

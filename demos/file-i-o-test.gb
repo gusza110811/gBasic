@@ -1,0 +1,8 @@
+set truth no
+read book truth
+set real $truth == yes
+?$real $read
+write book yes
+print just
+:read
+print read

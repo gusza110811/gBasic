@@ -38,7 +38,10 @@ class compiler:
         "||": 0xD0,
         "&&": 0xD1,
         "~~": 0xD2,
-        "quit": 0xAF
+        "read": 0xE0,
+        "write": 0xE1,
+        "awrite":0xE2,
+        "quit": 0xAF,
     }
 
     def add_instruction(opcode: int, value):
@@ -59,14 +62,17 @@ class compiler:
                 if token in compiler.commands:
                     opcode = compiler.commands[token]
                     lhs = chunks[idx - 1]
-                    rhs = chunks[idx + 1]
 
                     if lhs.startswith("$"):
                         compiler.add_instruction(0x05, lhs[1:])
                     else:
                         compiler.add_instruction(0xA0, lhs)
-
-                    compiler.add_instruction(opcode, rhs[1:] if rhs.startswith("$") else rhs)
+                    
+                    try:
+                        rhs = chunks[idx + 1]
+                        compiler.add_instruction(opcode, rhs[1:] if rhs.startswith("$") else rhs)
+                    except IndexError:
+                        pass
 
                     chunks = ["$"] + chunks[idx + 2:]
                     break
@@ -96,6 +102,9 @@ class compiler:
                 for word in args:
                     compiler.add_instruction(0x00, word)
             compiler.add_instruction(0x00, "\n")
+        
+        elif line[0] == "clean":
+            compiler.add_instruction(0x00, bytes(128))
 
         elif line[0] == "dump":
             compiler.add_instruction(0x01, "0")
@@ -120,6 +129,18 @@ class compiler:
             prompt = " ".join(line[2:]) if len(line) > 2 else "Input >"
             compiler.add_instruction(0x03, prompt)
             compiler.add_instruction(0x02, line[1])
+        
+        elif line[0] == "read":
+            compiler.add_instruction(0xE0,line[1])
+            compiler.add_instruction(0x02," ".join(line[2:]))
+        
+        elif line[0] == "write":
+            compiler.add_instruction(0xA0," ".join(line[2:]))
+            compiler.add_instruction(0xE1,line[1])
+
+        elif line[0] == "awrite":
+            compiler.add_instruction(0xA0," ".join(line[2:]))
+            compiler.add_instruction(0xE2,line[1])
 
     def compile(lines: str):
         compiler.bytecode.clear()
@@ -195,8 +216,8 @@ class parser:
 
 if __name__ == "__main__":
     try:
-        filename = sys.argv[1]
-        with open(filename) as f:
+        filename = "demos/file-i-o-test" #sys.argv[1]
+        with open(f"{filename}.gb") as f:
             code = f.read()
 
     except IndexError:
@@ -217,7 +238,7 @@ dump
         quit(1)
 
     bytecode = compiler.compile(code)
-    with open(filename + ".gbo", "wb") as f:
+    with open(filename + ".gbc", "wb") as f:
         f.write(bytecode)
 
-    print("Compiled to", filename + ".gbo")
+    print("Compiled to", filename + ".gbc")

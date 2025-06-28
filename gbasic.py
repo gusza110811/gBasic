@@ -2,7 +2,7 @@ import os
 import sys
 
 class memory:
-    value = {"line":0}
+    value = {"line":0,"n":"\n"}
 
 def strtobool(string:str):
     return not (string.lower()=="false")
@@ -45,7 +45,10 @@ class commands:
         return
     
     def clean(text:list[str]):
-        os.system("cls")
+        if os.name == "nt":
+            os.system("cls")
+        else:
+            os.system("clear")
     
     def gotoif(text:list[str]):
         condition = text[0]
@@ -54,6 +57,27 @@ class commands:
         if strtobool(condition): memory.value["line"] = int(line)
 
         return
+    
+    def read(text:list[str]):
+        filename = text[0]
+        key = text[1]
+        try:
+            with open(filename,"r") as file:
+                memory.value[key] = file.read()
+        except FileNotFoundError:
+            return
+    
+    def write(text:list[str]):
+        filename = text[0]
+        value = " ".join(text[1:])
+        with open(filename,"w") as file:
+            file.write(value)
+
+    def awrite(text:list[str]):
+        filename = text[0]
+        value = " ".join(text[1:])
+        with open(filename,"a") as file:
+            file.write(value)
 
 class parser:
     def parse(text:str, mem=None):
@@ -115,6 +139,7 @@ class parser:
         return chunks
 
     def variableparser(linechunks:list):
+        if not linechunks: return linechunks
 
         if linechunks[0] == "comment": return linechunks
 
@@ -127,6 +152,8 @@ class parser:
         return linechunks
 
     def calculationparser(chunks:list):
+        if not chunks: return chunks
+
         if chunks[0] == "comment": return chunks
 
         chunks = chunks.copy()
@@ -230,10 +257,14 @@ def executeline(line:list[str], mem:list[str]=None):
             command(line[1:])
         except IndexError:
             return memory.value, "Not enough parameters!"
+    except IndexError:
+        return memory.value, None
     except AttributeError:
         return memory.value, f"Unrecognized command: {line[0]}"
     except SyntaxError:
         return memory.value, f"Unrecognized command: {line[0]}"
+    except FileNotFoundError:
+        return memory.value, "File not Found"
 
     return memory.value, None
 
@@ -267,6 +298,10 @@ if __name__ == "__main__":
             quit()
     except IndexError:
         DEMO = """comment this line is a comment but dont use it like this if you're not hated by society
+read README.md readme
+print $readme
+
+awrite thing yeah $n
 
 # ram dump
 dump
