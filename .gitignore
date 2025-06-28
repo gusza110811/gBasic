@@ -1,4 +1,5 @@
 build
 dist
 gbasic.spec
-.env
+.*
+__pycache__
