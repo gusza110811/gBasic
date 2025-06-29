@@ -2,23 +2,29 @@
 import zipfile
 import sys
 import os
+import json
+
+BARRELVERSION = "1"
 
 class barrel:
     @staticmethod
-    def package(filename,includes):
-        with open("meta",'w') as metadata:
-            metadata.write(filename)
+    def package(filename,includes,isolate,packagename):
+        metadata = {
+            "main":filename,
+            "isolate":isolate
+        }
 
-        with zipfile.ZipFile(f"{filename}.bar","w") as bar:
+        with open("meta.json",'w') as metafile:
+            json.dump(metadata,metafile)
+
+        with zipfile.ZipFile(f"{packagename}.bar","w") as bar:
             bar.write(filename+".gbc")
-            bar.write("meta")
+            bar.write("meta.json")
             if includes:
                 for idx,thing in enumerate(includes):
                     bar.write(thing)
-                    if os.path.isfile(thing):
-                        bar.write(thing)
-                    else:
-                        print(f"Warning: {thing} not found, skipping.")
+        
+        os.remove("meta.json")
 
         print(f"Packaged {filename}.gbc as {filename}.bar")
 
@@ -27,11 +33,46 @@ if __name__ == "__main__":
     try:
         filename = sys.argv[1]
         try:
-            includes = sys.argv[2:]
+            args = sys.argv[2:]
         except IndexError:
-            includes = None
+            args = None
         
-        barrel.package(filename,includes)
+        packagename = filename
+        isolate = False
+        includes = []
+
+        # For source existence before proceeding with packing
+        with open(filename+".gbc"):pass
+
+        name = False
+        including = False
+        for idx, arg in enumerate(args):
+            if name:
+                packagename = arg
+                continue
+            elif including:
+                includes.append(arg)
+                continue
+
+            if arg.lower() == "isolate" or (arg.lower() == "-i"):
+                isolate = True
+            elif (arg.lower() == "include") or (arg.lower() == "-a"):
+                including = True
+            elif (arg.lower() == "includes") or (arg.lower() == "packswith") or (arg.lower() == "-p"):
+                try:
+                    includes = args[(idx+1):]
+                except IndexError:
+                    print("Add directories or files to include in the package")
+                    print(f"Or did you add \"{arg}\" by accident?")
+                    quit(3)
+            elif (arg.lower() == "name") or (arg.lower() == "-n"):
+                name = True
+            else:
+                print(f"Invalid parameter: \"{arg}\"")
+                quit(3)
+
+        
+        barrel.package(filename,includes,isolate,packagename)
 
     except IndexError:
         print("No File Specified")
@@ -39,4 +80,4 @@ if __name__ == "__main__":
 
     except FileNotFoundError:
         print(f"File not found: {filename}.gbc")
-        quit(1)
+        quit(2)

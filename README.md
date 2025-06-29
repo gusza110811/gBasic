@@ -10,7 +10,7 @@ Based off msBasic and batch
 ## Related stuff
 
 ### Gusza's ByteCode Language
-gByte / gBC / gBCL
+gBytecode / gBC / gBCL
 
 Odd Bytecode language that doesnt even try to mimic machine code
 
@@ -33,4 +33,4 @@ Barrel / gBP / Barrer
 
 Packages .gbc file to .bar file
 
-Has no use as of now since there isnt a reason to package anything with gBasic
+See barreldocs.md for more info on how to use it
