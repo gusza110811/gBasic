@@ -10,6 +10,7 @@ Option | Use
 `isolate` or `-i` | Make the package remove its virtual environment after execution.
 `include` or `-a` | Include one directory or file in the package
 `name` or `-n` | Set the name for the output package
+`root` or `-r` | Choose the root directory for the package. used when the current directory isnt the root directory for the package
 
 ### Includes
 After adding `includes`, any parameter after it is a directory or file to include in the final package

@@ -41,21 +41,27 @@ if __name__ == "__main__":
         isolate = False
         includes = []
 
-        # For source existence before proceeding with packing
-        with open(filename+".gbc"):pass
-
         name = False
         including = False
+        getroot = False
         for idx, arg in enumerate(args):
             if name:
                 packagename = arg
+                name = False
                 continue
             elif including:
                 includes.append(arg)
+                name = False
+                continue
+            elif getroot:
+                os.chdir(arg)
+                getroot = False
                 continue
 
             if arg.lower() == "isolate" or (arg.lower() == "-i"):
                 isolate = True
+            elif (arg.lower() == "root") or (arg.lower() == "-r"):
+                getroot = True
             elif (arg.lower() == "include") or (arg.lower() == "-a"):
                 including = True
             elif (arg.lower() == "includes") or (arg.lower() == "packswith") or (arg.lower() == "-p"):
@@ -71,7 +77,8 @@ if __name__ == "__main__":
                 print(f"Invalid parameter: \"{arg}\"")
                 quit(3)
 
-        
+        # Check for source existence before proceeding with packing
+        with open(filename+".gbc"):pass
         barrel.package(filename,includes,isolate,packagename)
 
     except IndexError:

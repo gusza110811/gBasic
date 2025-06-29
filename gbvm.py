@@ -1,6 +1,7 @@
 import sys
 import os
 import zipfile
+import json
 
 class virtual:
     memory = {"n":"\n"}
@@ -80,7 +81,7 @@ class virtual:
 
         elif opcode == 0xAF:  # quit
             code = virtual.read_ascii()
-            quit(code)
+            quit(int(code))
 
         # arithmetic ops
         elif opcode in range(0xB0, 0xB7):
@@ -162,11 +163,23 @@ class package:
             zipped.extractall(f".{file.replace("/",".")}")
         os.chdir(f".{file.replace("/",".")}")
         
-        with open("meta",'r') as mainscript:
-            mainscript = mainscript.read() + ".gbc"
+        metadata = {}
+        try:
+            with open("meta.json",'r') as metafile:
+                metadata = json.load(metafile)
+            mainscript = metadata["main"] + ".gbc"
+        # Legacy metafile
+        except FileNotFoundError:
+            with open("meta",'r') as metafile:
+                mainscript = metafile.read() + ".gbc"
         
         with open(mainscript, 'rb') as code:
             virtual.code = code.read()
+        
+        virtual.execute()
+
+        if metadata["isolate"]:
+            os.remove(f".{file.replace("/",".")}")
 
 if __name__ == "__main__":
     try:
@@ -185,5 +198,6 @@ if __name__ == "__main__":
 
     if filename[-3:] == "bar":
         package.unpack(filename)
+        quit(0)
 
     virtual.execute()

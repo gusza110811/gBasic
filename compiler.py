@@ -159,7 +159,7 @@ class compiler:
         for line in parsed:
             compiler.compilelineparsed(line)
 
-        compiler.add_instruction(0xAF, 0)
+        compiler.add_instruction(0xAF, '0')
 
         return bytes(compiler.bytecode)
 
