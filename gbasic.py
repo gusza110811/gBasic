@@ -58,6 +58,11 @@ class commands:
 
         return
     
+    def jump(text:list[str]):
+        line = text[0]
+        memory.value["line"] = int(line)
+        return
+    
     def read(text:list[str]):
         filename = text[0]
         key = text[1]
@@ -265,6 +270,8 @@ def executeline(line:list[str], mem:list[str]=None):
         return memory.value, f"Unrecognized command: {line[0]}"
     except FileNotFoundError:
         return memory.value, "File not Found"
+    except KeyboardInterrupt:
+        return memory.value, "Keyboard Interrupt"
 
     return memory.value, None
 
@@ -278,12 +285,12 @@ def execute(lines:str, mem:list[str]=None):
     while memory.value["line"] < len(lines.split("\n")):
         mem, error = executeline(parser.calculationparser(parser.variableparser(parsed[memory.value["line"]])))
         if error:
-            print(f"At line {memory.value["line"]+1} `{lines[memory.value["line"]]}`:")
+            print(f"At line {memory.value["line"]+1} `{lines.split("\n")[memory.value["line"]]}`:")
             print(f"    {error}")
-            return memory.value
+            quit(1)
         memory.value["line"] += 1
     
-    return memory.value
+    return
 
 if __name__ == "__main__":
     try:
@@ -297,36 +304,19 @@ if __name__ == "__main__":
             print("That Program doesn't exist")
             quit()
     except IndexError:
-        DEMO = """comment this line is a comment but dont use it like this if you're not hated by society
-read README.md readme
-print $readme
-
-awrite thing yeah $n
-
-# ram dump
-dump
-
-# basic loop.
-:loop
-# take user input
-input user Enter 1>
-
+        DEMO = """:loop
+input user truth>
 set isone $user == 1
-
-# exit the loop if user input is 1
 ?$isone $end
-
-clean
-print No!
-# the reason i am too lazy to add a seperate jump command
+print Go
 ?True $loop
-
-# free at last
 :end
-print Thank you
+print End
+dump
 """
         file = DEMO
 
 
     
     execute(file)
+    quit()

@@ -9,6 +9,8 @@ class virtual:
     code = []
     pc = 0
 
+    removeonquit = False
+
     @staticmethod
     def read_ascii():
         result = b""
@@ -16,7 +18,10 @@ class virtual:
             result += bytes([virtual.code[virtual.pc]])
             virtual.pc += 1
         virtual.pc += 1  # skip 0xFF
-        return result.decode("ascii")
+        result = result.decode("ascii")
+        if result.startswith("$"):
+            result = virtual.memory[result[1:]]
+        return result
 
     @staticmethod
     def read_int():
@@ -68,8 +73,12 @@ class virtual:
             target = virtual.read_int()
             if virtual.acc.lower() != "false":
                 virtual.pc = target+1
+        
+        elif opcode == 0x05:  # gotoif
+            target = virtual.read_int()
+            virtual.pc = target+1
 
-        elif opcode == 0x05:  # load
+        elif opcode == 0xA5:  # load
             varname = virtual.read_ascii()
             virtual.acc = virtual.memory.get(varname, "")
 
@@ -175,11 +184,9 @@ class package:
         
         with open(mainscript, 'rb') as code:
             virtual.code = code.read()
-        
-        virtual.execute()
 
         if metadata["isolate"]:
-            os.remove(f".{file.replace("/",".")}")
+            virtual.removeonquit = True
 
 if __name__ == "__main__":
     try:
@@ -200,4 +207,14 @@ if __name__ == "__main__":
         package.unpack(filename)
         quit(0)
 
-    virtual.execute()
+    try:
+        virtual.execute()
+    except KeyboardInterrupt:
+        print("\nProgram has been aborted due to Keyboard Interrupt")
+    except Exception as error:
+        print("Program has been aborted due to an Error")
+        print("     "+str(error))
+        quit(255)
+
+    if virtual.removeonquit:
+        os.remove(f".{filename.replace("/",".")}")

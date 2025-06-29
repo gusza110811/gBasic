@@ -24,7 +24,7 @@ class compiler:
         "set": 0x02,
         "input": 0x03,
         "gotoif": 0x04,
-        "load": 0x05,
+        "jump": 0x05,
         "+": 0xB0,
         "-": 0xB1,
         "*": 0xB2,
@@ -42,6 +42,7 @@ class compiler:
         "write": 0xE1,
         "awrite":0xE2,
         "quit": 0xAF,
+        "load": 0xA5,
     }
 
     def add_instruction(opcode: int, value):
@@ -64,7 +65,7 @@ class compiler:
                     lhs = chunks[idx - 1]
 
                     if lhs.startswith("$"):
-                        compiler.add_instruction(0x05, lhs[1:])
+                        compiler.add_instruction(0xA5, lhs[1:])
                     else:
                         compiler.add_instruction(0xA0, lhs)
                     
@@ -112,7 +113,7 @@ class compiler:
         elif line[0] == "gotoif":
             cond = line[1]
             if cond.startswith("$"):
-                compiler.add_instruction(0x05, cond[1:])
+                compiler.add_instruction(0xA5, cond[1:])
             else:
                 compiler.add_instruction(0xA0, cond)
             try:
@@ -120,9 +121,17 @@ class compiler:
             except KeyError:
                 label = None
             compiler.add_instruction(0x04, label)
+        
+        elif line[0] == "jump":
+            try:
+                label = compiler.labelmap[line[1][1:]]
+            except KeyError:
+                label = None
+            compiler.add_instruction(0x05, label)
 
         elif line[0] == "set":
             chunks = compiler.compile_expr(line[2:])
+            compiler.add_instruction(0xA0, " ".join(chunks))
             compiler.add_instruction(0x02, line[1])
 
         elif line[0] == "input":
