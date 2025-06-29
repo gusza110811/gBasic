@@ -2,4 +2,5 @@ build
 dist
 gbasic.spec
 .*
+*.bar
 __pycache__
