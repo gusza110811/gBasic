@@ -16,7 +16,7 @@ Odd Bytecode language that doesnt even try to mimic machine code
 
 #### File extension: .gbc
 
-#### Gusza's BASIC Archive
+### Gusza's BASIC Archive
 gAR / gBar
 
 Archive file containing the program and its stuff
