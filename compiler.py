@@ -45,10 +45,13 @@ class compiler:
         "load": 0xA5,
     }
 
-    def add_instruction(opcode: int, value):
+    def add_instruction(opcode: int, value:str=None):
         compiler.bytecode.append(opcode)
         if isinstance(value, int):
-            length = math.ceil(value/((2**8)-1))
+            try:
+                length = math.ceil((math.floor(math.log2(value))+1)/8)
+            except ValueError:
+                length = 1
             compiler.bytecode.extend(length.to_bytes(1))
             compiler.bytecode.extend(value.to_bytes(length, byteorder="big"))
         elif isinstance(value, str):
@@ -57,7 +60,7 @@ class compiler:
 
     def compile_expr(expr: list[str]):
         done = False
-        chunks = expr[:]
+        chunks = expr
         while not done:
             for idx, token in enumerate(chunks):
                 if token in compiler.commands:
@@ -75,20 +78,20 @@ class compiler:
                     except IndexError:
                         pass
 
-                    chunks = ["$"] + chunks[idx + 2:]
+                    chunks = chunks[idx + 2:]
                     break
             else:
                 done = True
         return chunks
 
-    def simulate_length(line: list[str]):
+    def simulate_length(line: list[str],linen):
         initial_len = len(compiler.bytecode)
-        compiler.compilelineparsed(line)
+        compiler.compilelineparsed(line,linen)
         delta = len(compiler.bytecode) - initial_len
         del compiler.bytecode[initial_len:]
         return delta
 
-    def compilelineparsed(line: list[str]):
+    def compilelineparsed(line: list[str],linenumber:int):
         if line[0] == "comment":
             compiler.bytecode.append(0xAB)
             compiler.bytecode.append(0xFF)
@@ -96,13 +99,14 @@ class compiler:
 
         if line[0] == "print":
             args = line[1:]
-            if len(args) == 1:
-                chunks = compiler.compile_expr(args)
-                compiler.add_instruction(0x00, chunks[0] if chunks[0] != "$" else "_")
-            else:
-                for word in args:
-                    compiler.add_instruction(0x00, word)
-            compiler.add_instruction(0x00, "\n")
+            for word in args:
+                if word.startswith("$"):
+                    compiler.add_instruction(0xA0,word[1:])
+                else:
+                    compiler.add_instruction(0xA0,word)
+                compiler.add_instruction(0x00, "")
+            compiler.add_instruction(0xA0,"\n")
+            compiler.add_instruction(0x00,"")
         
         elif line[0] == "clean":
             compiler.add_instruction(0x00, bytes(128))
@@ -113,6 +117,7 @@ class compiler:
         elif line[0] == "gotoif":
             cond = line[1]
             if cond.startswith("$"):
+                print(cond)
                 compiler.add_instruction(0xA5, cond[1:])
             else:
                 compiler.add_instruction(0xA0, cond)
@@ -130,8 +135,7 @@ class compiler:
             compiler.add_instruction(0x05, label)
 
         elif line[0] == "set":
-            chunks = compiler.compile_expr(line[2:])
-            compiler.add_instruction(0xA0, " ".join(chunks))
+            compiler.compile_expr(line[2:])
             compiler.add_instruction(0x02, line[1])
 
         elif line[0] == "input":
@@ -150,6 +154,10 @@ class compiler:
         elif line[0] == "awrite":
             compiler.add_instruction(0xA0," ".join(line[2:]))
             compiler.add_instruction(0xE2,line[1])
+        
+        elif line[0] == "blank":
+            length = math.ceil(int(line[1])/2)
+            compiler.add_instruction(0xAB,"0"*(length-2))
 
     def compile(lines: str):
         compiler.bytecode.clear()
@@ -161,12 +169,12 @@ class compiler:
         for line in parsed:
             if line and line[0] == "comment" and len(line) > 1 and line[1].startswith(":"):
                 compiler.labelmap[line[1][1:]] = pc
-            pc += compiler.simulate_length(line)
+            pc += compiler.simulate_length(line,pc)
         
 
         # Second pass: real compilation
-        for line in parsed:
-            compiler.compilelineparsed(line)
+        for idx, line in enumerate(parsed):
+            compiler.compilelineparsed(line,idx)
 
         compiler.add_instruction(0xAF, '0')
 

@@ -12,15 +12,13 @@ class virtual:
     removeonquit = False
 
     @staticmethod
-    def read_ascii():
+    def read_ascii(allowvar=False):
         result = b""
         while virtual.pc < len(virtual.code) and virtual.code[virtual.pc] != 0xFF:
             result += bytes([virtual.code[virtual.pc]])
             virtual.pc += 1
         virtual.pc += 1  # skip 0xFF
-        result = result.decode("ascii")
-        if result.startswith("$"):
-            result = virtual.memory[result[1:]]
+        result = result.decode()
         return result
 
     @staticmethod
@@ -44,18 +42,7 @@ class virtual:
         virtual.pc += 1
 
         if opcode == 0x00:  # print
-            val = virtual.read_ascii()
-            val = virtual.memory.get(val, val) if val != "_" else virtual.acc
-            try:
-                if bytes(val,'utf-8') == bytes(128):
-                    if os.name == "nt":
-                        os.system("cls")
-                    else:
-                        os.system("clear")
-            except UnicodeDecodeError:
-                pass
-            else:
-                print(val, end="")
+            print(virtual.acc, end="")
 
         elif opcode == 0x01:  # dump
             for k, v in virtual.memory.items():
@@ -74,7 +61,7 @@ class virtual:
             if virtual.acc.lower() != "false":
                 virtual.pc = target+1
         
-        elif opcode == 0x05:  # gotoif
+        elif opcode == 0x05:  # jump
             target = virtual.read_int()
             virtual.pc = target+1
 
@@ -126,7 +113,7 @@ class virtual:
                     virtual.acc = str(lhsf < rhsf)
                 elif opcode == 0xC2:
                     virtual.acc = str(lhsf > rhsf)
-            except:
+            except ValueError:
                 if opcode == 0xC0:
                     virtual.acc = str(lhs == rhs)
                 else:
@@ -205,16 +192,16 @@ if __name__ == "__main__":
 
     if filename[-3:] == "bar":
         package.unpack(filename)
-        quit(0)
 
     try:
         virtual.execute()
     except KeyboardInterrupt:
         print("\nProgram has been aborted due to Keyboard Interrupt")
-    except Exception as error:
+
+    """    except Exception as error:
         print("Program has been aborted due to an Error")
         print("     "+str(error))
-        quit(255)
+        quit(255)"""
 
     if virtual.removeonquit:
         os.remove(f".{filename.replace("/",".")}")

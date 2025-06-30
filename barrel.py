@@ -26,7 +26,7 @@ class barrel:
         
         os.remove("meta.json")
 
-        print(f"Packaged {filename}.gbc as {filename}.bar")
+        print(f"Packaged {filename}.gbc as {packagename}.bar")
 
 
 if __name__ == "__main__":
