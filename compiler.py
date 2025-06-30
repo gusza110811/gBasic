@@ -117,7 +117,6 @@ class compiler:
         elif line[0] == "gotoif":
             cond = line[1]
             if cond.startswith("$"):
-                print(cond)
                 compiler.add_instruction(0xA5, cond[1:])
             else:
                 compiler.add_instruction(0xA0, cond)
