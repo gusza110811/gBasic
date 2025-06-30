@@ -93,23 +93,27 @@ class compiler:
 
     def compilelineparsed(line: list[str],linenumber:int):
         if line[0] == "comment":
-            compiler.bytecode.append(0xAB)
-            compiler.bytecode.append(0xFF)
             return
 
         if line[0] == "print":
             args = line[1:]
-            for word in args:
+            for idx,word in enumerate(args):
                 if word.startswith("$"):
                     compiler.add_instruction(0xA0,word[1:])
                 else:
                     compiler.add_instruction(0xA0,word)
+                
                 compiler.add_instruction(0x00, "")
+
+                if idx < (len(args)-1):
+                    compiler.add_instruction(0xA0," ")
+                    compiler.add_instruction(0x00)
             compiler.add_instruction(0xA0,"\n")
             compiler.add_instruction(0x00,"")
         
         elif line[0] == "clean":
-            compiler.add_instruction(0x00, bytes(128))
+            compiler.add_instruction(0xA0,128)
+            compiler.add_instruction(0x00)
 
         elif line[0] == "dump":
             compiler.add_instruction(0x01, "0")
@@ -168,8 +172,8 @@ class compiler:
         for line in parsed:
             if line and line[0] == "comment" and len(line) > 1 and line[1].startswith(":"):
                 compiler.labelmap[line[1][1:]] = pc
-            pc += compiler.simulate_length(line,pc)
-        
+            else:
+                pc += compiler.simulate_length(line,pc)
 
         # Second pass: real compilation
         for idx, line in enumerate(parsed):

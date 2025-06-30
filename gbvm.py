@@ -18,7 +18,10 @@ class virtual:
             result += bytes([virtual.code[virtual.pc]])
             virtual.pc += 1
         virtual.pc += 1  # skip 0xFF
-        result = result.decode()
+        try:
+            result = result.decode()
+        except UnicodeDecodeError:
+            pass
         return result
 
     @staticmethod
@@ -42,7 +45,14 @@ class virtual:
         virtual.pc += 1
 
         if opcode == 0x00:  # print
-            print(virtual.acc, end="")
+            if virtual.acc == b"\x01\x80":
+                if os.name == "nt":
+                    os.system("cls")
+                else:
+                    os.system("clear")
+                
+            else:
+                print(virtual.acc, end="")
 
         elif opcode == 0x01:  # dump
             for k, v in virtual.memory.items():
@@ -59,11 +69,11 @@ class virtual:
         elif opcode == 0x04:  # gotoif
             target = virtual.read_int()
             if virtual.acc.lower() != "false":
-                virtual.pc = target+1
+                virtual.pc = target
         
         elif opcode == 0x05:  # jump
             target = virtual.read_int()
-            virtual.pc = target+1
+            virtual.pc = target
 
         elif opcode == 0xA5:  # load
             varname = virtual.read_ascii()
