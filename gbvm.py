@@ -87,7 +87,7 @@ class virtual:
 
         elif opcode == 0xAF:  # quit
             code = virtual.read_ascii()
-            quit(int(code))
+            sys.exit(int(code))
 
         # arithmetic ops
         elif opcode in range(0xB0, 0xB7):
@@ -198,7 +198,7 @@ if __name__ == "__main__":
 
     except FileNotFoundError:
         print("File not found.")
-        quit(1)
+        sys.exit(1)
 
     if filename[-3:] == "bar":
         package.unpack(filename)

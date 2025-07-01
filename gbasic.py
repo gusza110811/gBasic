@@ -302,7 +302,7 @@ if __name__ == "__main__":
                 file = rawfile.read()
         except FileNotFoundError:
             print("That Program doesn't exist")
-            quit()
+            sys.exit()
     except IndexError:
         DEMO = """:loop
 input user truth>
@@ -319,4 +319,4 @@ dump
 
     
     execute(file)
-    quit()
+    sys.exit()

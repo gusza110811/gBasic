@@ -255,7 +255,7 @@ dump
 
     except FileNotFoundError:
         print("File not found.")
-        quit(1)
+        sys.exit(1)
 
     bytecode = compiler.compile(code)
     with open(filename + ".gbc", "wb") as f:
