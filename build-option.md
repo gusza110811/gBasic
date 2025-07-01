@@ -10,7 +10,7 @@ Run the installer in the commandline with the options you want. Compiled(Frozen)
 | option | alt | usage |
 | -- | -- | -- |
 | compiler | -c | Include compiler
-| vm | -m | Include VM
+| vm | -m | Include VM (gBvm)
 | barrel | -b , -bar | Include Packager (Barrel)
 | demos | demo , -d | Include demos in _internal
 | skip | -y | Skip all confirmations

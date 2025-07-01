@@ -37,8 +37,8 @@ def confirm(include_compiler, include_virtual_machine, include_barrel):
 helpmsg = """(python )build(.py) [options]
 Options
     -c : Include Compiler
-    -m : Include VM
-    -b : Include Packager (gBvm)
+    -m : Include VM (gBvm)
+    -b : Include Packager (Barrel)
     -d : Include Demos in _internal
     -a : Include everything above
 
@@ -90,7 +90,7 @@ if not skip_confirm:
 else:
     print("Skipping all confirmations\n")
 
-print("Building Interpreter")
+print("\nBuilding Interpreter\n")
 installargs = [
     "gbasic.py"
 ]
@@ -103,7 +103,7 @@ if include_demo:
 PyInstaller.__main__.run(installargs)
 
 if include_compiler:
-    print("Building Compiler")
+    print("\n\nBuilding Compiler\n")
     installargs = [
         "compiler.py"
     ]
@@ -116,7 +116,7 @@ if include_compiler:
     PyInstaller.__main__.run(installargs)
 
 if include_barrel:
-    print("Building Packager (Barrel)")
+    print("\n\nBuilding Packager (Barrel)\n")
     installargs = [
         "barrel.py"
     ]
@@ -129,7 +129,7 @@ if include_barrel:
     PyInstaller.__main__.run(installargs)
 
 if include_virtual_machine:
-    print("Building Virtual Machine (gBvm)")
+    print("\n\nBuilding Virtual Machine (gBvm)\n")
     installargs = [
         "gbvm.py"
     ]
