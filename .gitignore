@@ -1,6 +1,6 @@
 build
 dist
-gbasic.spec
+*.spec
 .*
 !.env
 *.bar

@@ -35,6 +35,12 @@ for param in params:
         include_demo = True
     elif param == "skip" or param == "-y":
         skip_confirm = True
+    elif param == "all" or param == "-a":
+        include_compiler = True
+        include_virtual_machine = True
+        include_barrel = True
+
+        include_demo = True
     elif param == "help" or param == "-h":
         help = True
 
