@@ -3,7 +3,7 @@ import os
 try:
     import PyInstaller.__main__
 except ImportError:
-    print("Missing require library for installation: Pyinstaller.")
+    print("Missing required library for installation: Pyinstaller.")
     print("Library 'Pyinstaller' is included in the local environment '.env', did you try to run this script in global environment?\n")
     print("If you prefer to install gbasic in global enviroment, please install PyInstaller there")
     if os.name == "nt":
@@ -11,6 +11,44 @@ except ImportError:
     elif os.name == "posix":
         print("You can use `pip install pyinstaller` but it depends on your configuration and OS")
     sys.exit(2)
+
+def confirm(include_compiler, include_virtual_machine, include_barrel):
+    if include_compiler and (not include_virtual_machine):
+        abort = input("Compiler is selected, but VM is not, You will not be able to run compiled gBasic. \nAre you sure you want to proceed? (Y/n)").lower() == "n"
+        if abort:
+            sys.exit("Build aborted")
+
+        print("\n")
+
+    if include_barrel and (not include_virtual_machine):
+        abort = input("Packager is selected, but VM is not, You will not be able to run packaged gBasic. \nAre you sure you want to proceed? (Y/n)").lower() == "n"
+        if abort:
+            sys.exit("Build aborted")
+
+        print("\n")
+
+    if include_barrel and (not include_compiler):
+        abort = input("Packager is selected, but the compiler is not. You can only package Bytecodes from the compiler. \nAre you sure you want to proceed? (Y/n)").lower() == "n"
+        if abort:
+            sys.exit("Build aborted")
+
+        print("\n")
+
+helpmsg = """(python )build(.py) [options]
+Options
+    -c : Include Compiler
+    -m : Include VM
+    -b : Include Packager (gBvm)
+    -d : Include Demos in _internal
+    -a : Include everything above
+
+    -y : Skip all confirmation
+    -h : Show this message
+"""
+def help():
+    global helpmsg
+    print(helpmsg)
+    sys.exit()
 
 params = sys.argv
 
@@ -44,51 +82,13 @@ for param in params:
     elif param == "help" or param == "-h":
         send_help = True
 
-def confirm(include_compiler, include_virtual_machine, include_barrel):
-    if include_compiler and (not include_virtual_machine):
-        abort = input("Compiler is selected, but VM is not, You will not be able to run compiled gBasic. \nAre you sure you want to proceed? (Y/n)").lower() == "n"
-        if abort:
-            sys.exit("Build aborted")
-
-        print("\n")\
-
-    if include_barrel and (not include_virtual_machine):
-        abort = input("Packager is selected, but VM is not, You will not be able to run packaged gBasic. \nAre you sure you want to proceed? (Y/n)").lower() == "n"
-        if abort:
-            sys.exit("Build aborted")
-
-        print("\n")
-
-    if include_barrel and (not include_compiler):
-        abort = input("Packager is selected, but the compiler is not. You can only package Bytecodes from the compiler. \nAre you sure you want to proceed? (Y/n)").lower() == "n"
-        if abort:
-            sys.exit("Build aborted")
-
-        print("\n")
-
-helpmsg = """(python )build(.py) [options]
-Options
-    -c : Include Compiler
-    -m : Include VM
-    -b : Include Packager (gBvm)
-    -d : Include Demos in _internal
-    -a : Include everything above
-
-    -y : Skip all confirmation
-    -h : Show this message
-"""
-def help():
-    global helpmsg
-    print(helpmsg)
-    sys.exit()
+if send_help:
+    help()
 
 if not skip_confirm:
     confirm(include_compiler, include_virtual_machine, include_barrel)
 else:
     print("Skipping all confirmations\n")
-
-if send_help:
-    help()
 
 print("Building Interpreter")
 installargs = [
