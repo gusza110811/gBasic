@@ -4,13 +4,24 @@ try:
     import PyInstaller.__main__
 except ImportError:
     print("Missing required library for installation: Pyinstaller.")
-    print("Library 'Pyinstaller' is included in the local environment '.env', did you try to run this script in global environment?\n")
-    print("If you prefer to install gbasic in global enviroment, please install PyInstaller there")
     if os.name == "nt":
-        print("Run `pip install pyinstaller` to install it")
+        yes = input("Do you want to try installing it now? (Y/n)").lower() == "y"
+        if yes:
+            exitcode = os.system("pip install pyinstaller")
+            if exitcode == 0:
+                print("\nSuccessful, proceeding to installation")
+                import PyInstaller.__main__
+            else:
+                print("Failed to install PyInstaller.")
+                sys.exit(2)
+        else:
+            sys.exit()
     elif os.name == "posix":
-        print("You can use `pip install pyinstaller` but it depends on your configuration and OS")
-    sys.exit(2)
+        print("Library 'Pyinstaller' is included in the local environment '.env', did you try to run this script in global environment?\n")
+        print("If you want to run this in the local environment,")
+        print("run this to use the virtual environment: `source .env/bin/activate`")
+        print("Or you can use `pip install pyinstaller` to install it in the global environment but it depends on your configuration and OS")
+        sys.exit(2)
 
 def confirm(include_compiler, include_virtual_machine, include_barrel):
     if include_compiler and (not include_virtual_machine):
