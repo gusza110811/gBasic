@@ -16,9 +16,9 @@ use # to comment the text after it, can be used in line
 `input {variable name} (prompt)` Ask the user (prompt) and set variable {variable name} to the user's answer
 
 ## If statement and Loops
-`:{label name}` : set variable {label name}'s value to the current line
+`:{label name}` : set variable {label name}'s value to the current line number
 
-`?{condition} {target}` or `if {condition} {target}` or `gotoif {condition} {target}`: Go to {target} if {condition} is true
+`?{condition} {target}` or `if {condition} {target}` or `gotoif {condition} {target}`: Go to line {target} if {condition} is true
 
 ## Affixes
 Use `${variable name}` to get {variable name}'s value
@@ -38,13 +38,13 @@ Supported calculations are
 `||`or `&&`and `~~`not
 
 ### Note
-Each of these symbols above must be seperated from surrounding text with spaces to do their assigned functions, other wise it is considered plain text
+Each of these symbols above must be seperated from surrounding text with spaces to do their assigned functions, otherwise it is simply plain text
 
 for example
 `5 ** 2` means 5<sup>2</sup> and is considered as one token `25`. while `5**2` is just `5**2`
 
-`2 == 9` means 2=9 and is considered as one token `False` while `2==9` is just `2==9`
+`2 == 9` means 2=9 and is equal to `False` while `2==9` is just `2==9`
 
-`~~ False` means not(False) and is considered as one token `True` while `~~False` is just `~~False`
+`~~ False` means not(False) and is equal to `True` while `~~False` is just `~~False`
 
 ###### \*Compiled and Interpreted gBasic may be slightly different
