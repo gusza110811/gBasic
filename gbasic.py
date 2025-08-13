@@ -287,12 +287,24 @@ def execute(lines:str, mem:list[str]=None):
         if error:
             print(f"At line {memory.value["line"]+1} `{lines.split("\n")[memory.value["line"]]}`:")
             print(f"    {error}")
-            quit(1)
+            sys.exit(1)
         memory.value["line"] += 1
     
     return
 
+def shell():
+    while 1:
+        try:
+            line = input(f"gB {os.getcwd()}# ")
+            execute(line)
+        except SystemExit:
+            continue
+        except KeyboardInterrupt:
+            print("\nExit")
+            sys.exit(0)
+
 if __name__ == "__main__":
+    shellmode = False
     try:
         filename = sys.argv[1]
         file = ""
@@ -304,19 +316,10 @@ if __name__ == "__main__":
             print("That Program doesn't exist")
             sys.exit()
     except IndexError:
-        DEMO = """:loop
-input user truth>
-set isone $user == 1
-?$isone $end
-print Go
-jump $loop
-:end
-print End
-dump
-"""
-        file = DEMO
-
-
+        shellmode = True
     
-    execute(file)
-    sys.exit()
+    if not shellmode:
+        execute(file)
+        sys.exit()
+    else:
+        shell()
