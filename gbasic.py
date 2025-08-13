@@ -309,7 +309,7 @@ input user truth>
 set isone $user == 1
 ?$isone $end
 print Go
-?True $loop
+jump $loop
 :end
 print End
 dump

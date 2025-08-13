@@ -10,15 +10,22 @@ use # to comment the text after it, can be used in line
 
 `dump` : Outputs all variables set
 
+# File I/O
+`write {filename} {text}` : write {text} to file {filename}, overwriting anything still in it
+`awrite {filename} {text}` : add {text} to the end of file {filename}
+`read {filename} {variable}`: save data of file {filename} to {variable}
+
 ## Variables
 `set {name} (value)` Create and set a a variable {name} to (value)
 
 `input {variable name} (prompt)` Ask the user (prompt) and set variable {variable name} to the user's answer
 
-## If statement and Loops
+## If statement and flow control
 `:{label name}` : set variable {label name}'s value to the current line number
 
-`?{condition} {target}` or `if {condition} {target}` or `gotoif {condition} {target}`: Go to line {target} if {condition} is true
+`?{condition} ${target}` or `if {condition} ${target}` or `gotoif {condition} ${target}`: Go to line {target} if {condition} is true
+
+`jump ${target}`: jump to {target}
 
 ## Affixes
 Use `${variable name}` to get {variable name}'s value
